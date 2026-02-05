@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Plantify</title>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+
+    <link rel="stylesheet" href="assets/tailwind.css" />
+    <link rel="stylesheet" href="assets/fontawesome/css/all.css" />
+    <link rel="stylesheet" href="style/style.css" />
+
+    <style>
+      @font-face {
+        font-family: "Digital";
+        src: url("assets/digital.woff2") format("woff2");
+        font-weight: 100 900;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: "Montserrat";
+        src: url("assets/montserrat.woff2") format("woff2");
+        font-weight: 100 900;
+        font-style: normal;
+      }
+    </style>
+  </head>
+
+  <body
+    class="max-w-screen-md mx-auto scroll-smooth text-gray-600 font-semibold antialiased text-center"
+  >
+    <!-- HEADER -->
+    <div class="grid mt-6">
+      <div class="grid grid-cols-3 items-center mx-7">
+        <div class="text-left">
+          <a href="dashboard.html" class="fas fa-chevron-left text-xl"></a>
+        </div>
+        <a href="" class="flex flex-col items-center">
+          <div class="flex items-center">
+            <i class="fas fa-seedling text-xl text-green-600"></i>
+            <span class="font-extrabold text-xl mx-2">Plantify</span>
+            <span class="text-xs">v1.1</span>
+          </div>
+          <div class="text-xs font-semibold">By doycodes</div>
+        </a>
+        <div class="text-right">
+          <a class="fas fa-chart-line text-xl"></a>
+        </div>
+      </div>
+    </div>
+    <!--  -->
+
+    <!-- ENDPOINT -->
+    <div class="grid mx-7 mt-10 rounded-3xl neumorphism">
+      <div class="grid px-5 py-4">
+        <div class="flex items-center justify-start">
+          <div class="fas fa-rss fa-lg mr-2 text-green-600"></div>
+          <div class="text-xs font-bold">Connect Plantify !</div>
+        </div>
+        <form id="urlForm">
+          <div class="grid grid-cols-3 gap-4 mt-5">
+            <input
+              class="neutank col-span-2 font-bold text-xs rounded-2xl py-2 px-5 text-center"
+              type="text"
+              id="endpointUrl"
+              name="endpointUrl"
+              placeholder="Default : 192.168.3.142"
+              required
+            />
+            <button
+              type="submit"
+              class="neumorphism2 font-bold text-sm rounded-2xl py-2"
+            >
+              Set !
+            </button>
+          </div>
+        </form>
+        <span id="output" class="text-green-600 text-xs mt-5"></span>
+      </div>
+    </div>
+    <!--  -->
+
+    <!-- PRESET -->
+    <div class="grid mx-7 mt-7 mb-7 font-bold neumorphism rounded-3xl p-4">
+      <div class="flex text-left">
+        <span class="fas fa-list mr-2 text-green-600"></span>
+        <span class="text-xs">Presets</span>
+      </div>
+
+      <div class="grid grid-cols-9 gap-4 mt-3">
+        <div class="grid col-span-7">
+          <div
+            class="neutank digital grid grid-cols-7 justify-center items-center rounded-2xl py-2 px-1"
+          >
+            <button id="prev-preset" class="fas fa-chevron-left"></button>
+            <div class="col-span-5">
+              <div id="preset-title" class="text-xl font-extrabold">
+                Lettuce
+              </div>
+              <div id="preset-menu" class="text-xl font-extrabold">
+                500 - 700 ppm
+              </div>
+            </div>
+            <button id="next-preset" class="fas fa-chevron-right"></button>
+          </div>
+        </div>
+        <div class="grid col-span-2">
+          <button
+            id="set-button"
+            class="neumorphism2 grid items-center rounded-2xl font-bold text-sm"
+          >
+            <span>Set !</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!--  -->
+
+    <!-- SLIDER 1 -->
+    <div class="grid mx-7 mt-7 mb-7">
+      <div class="grid grid-cols-2 gap-7">
+        <div class="font-bold neumorphism rounded-3xl py-4">
+          <div class="flex items-center justify-center">
+            <i class="fas fa-syringe text-green-600"></i>
+            <span class="text-xs ml-1">pH Range</span>
+          </div>
+          <div class="grid grid-cols-2 pt-3 px-4 gap-3">
+            <div class="flex flex-col items-center">
+              <div class="text-green-600 text-xs">Min</div>
+              <input
+                type="range"
+                id="slider1"
+                class="form-range my-24"
+                min="0"
+                max="14"
+                step="0.5"
+                value="0"
+                style="
+                  accent-color: green;
+                  transform: rotate(-90deg);
+                  width: 180px;
+                "
+              />
+              <div
+                class="digital neutank grid bg-black bg-opacity-10 text-xl w-full rounded-xl p-1"
+                id="slider-1"
+              >
+                -
+              </div>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="text-green-600 text-xs">Max</div>
+              <input
+                type="range"
+                id="slider2"
+                class="form-range my-24"
+                min="0"
+                max="14"
+                step="0.5"
+                value="0"
+                style="
+                  accent-color: green;
+                  transform: rotate(-90deg);
+                  width: 180px;
+                "
+              />
+              <div
+                class="digital neutank grid bg-black bg-opacity-10 text-xl w-full rounded-xl p-1"
+                id="slider-2"
+              >
+                -
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="font-bold neumorphism rounded-3xl py-4">
+          <div class="flex items-center justify-center">
+            <i class="fas fa-syringe text-green-600"></i>
+            <span class="text-xs ml-1">PPM Range</span>
+          </div>
+          <div class="grid grid-cols-2 pt-3 px-4 gap-3">
+            <div class="flex flex-col items-center">
+              <div class="text-green-600 text-xs">Min</div>
+              <input
+                type="range"
+                id="slider3"
+                class="form-range my-24"
+                min="0"
+                max="1000"
+                step="50"
+                value="0"
+                style="
+                  accent-color: green;
+                  transform: rotate(-90deg);
+                  width: 180px;
+                "
+              />
+              <div
+                class="digital neutank grid bg-black bg-opacity-10 text-xl w-full rounded-xl p-1"
+                id="slider-3"
+              >
+                -
+              </div>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="text-green-600 text-xs">Max</div>
+              <input
+                type="range"
+                id="slider4"
+                class="form-range my-24"
+                min="0"
+                max="1000"
+                step="50"
+                value="0"
+                style="
+                  accent-color: green;
+                  transform: rotate(-90deg);
+                  width: 180px;
+                "
+              />
+              <div
+                class="digital neutank grid bg-black bg-opacity-10 text-xl w-full rounded-xl p-1"
+                id="slider-4"
+              >
+                -
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--  -->
+
+    <!-- SLIDER 2 -->
+    <div class="grid mx-7 mt-7 mb-7 font-bold neumorphism rounded-3xl p-4">
+      <div class="flex items-center text-left text-sm">
+        <i class="fas fa-sun text-green-600 mr-2"></i>
+        <span class="text-xs">Growlight</span>
+      </div>
+      <div class="grid grid-cols-3 gap-4 mt-1">
+        <input
+          type="range"
+          id="slider5"
+          class="form-range col-span-2"
+          min="0"
+          max="100"
+          step="5"
+          value="0"
+          style="accent-color: green"
+        />
+        <div
+          class="digital neutank flex justify-center bg-black bg-opacity-10 text-xl w-full rounded-xl p-1"
+        >
+          <span id="slider-5" class="mr-1">-</span>
+          <span>%</span>
+        </div>
+      </div>
+    </div>
+    <div class="grid mx-7 mt-7 mb-7 font-bold neumorphism rounded-3xl p-4">
+      <div class="flex items-center text-left text-sm">
+        <i class="fas fa-wind text-green-600 mr-2"></i>
+        <span class="text-xs">Fan</span>
+      </div>
+      <div class="grid grid-cols-3 gap-4 mt-1">
+        <input
+          type="range"
+          id="slider6"
+          class="form-range col-span-2"
+          min="0"
+          max="100"
+          step="5"
+          value="0"
+          style="accent-color: green"
+        />
+        <div
+          class="digital neutank flex justify-center bg-black bg-opacity-10 text-xl w-full rounded-xl p-1"
+        >
+          <span id="slider-6" class="mr-1">-</span>
+          <span>%</span>
+        </div>
+      </div>
+    </div>
+    <!--  -->
+
+    <!-- RESET -->
+    <button
+      id="reset-button"
+      class="mb-10 neumorphism px-5 py-2 rounded-3xl text-sm font-bold"
+    >
+      <span class="fas fa-refresh text-green-600 mr-1"></span>
+      <span>Reset Settings !</span>
+    </button>
+    <!--  -->
+
+    <!-- LOAD JS -->
+    <script src="js/endpoint.js"></script>
+    <script src="js/slider.js"></script>
+    <script src="js/reset.js"></script>
+    <!--  -->
+  </body>
+</html>

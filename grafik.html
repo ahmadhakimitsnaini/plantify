@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Hydropro</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="assets/tailwind.css">
+  <link href="style/style.css" rel="stylesheet">
+  <link href="assets/fontawesome/css/all.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/sweetalert2.min.css">
+
+  <script src="assets/sweetalert2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+  <style>
+    @font-face {
+      font-family: 'Montserrat';
+      src: url('assets/montserrat.woff2') format('woff2');
+      font-weight: 100 900;
+      font-style: normal;
+    }
+  </style>
+</head>
+
+<body class="container mx-auto text-center scroll-smooth bg-gray-200 text-gray-600 antialiased">
+
+  <!-- BAGIAN HEADER -->
+  <div class="grid grid-cols-3 items-center rounded-b-3xl py-5 mb-5 shadow-md bg-white fixed top-0 left-0 right-0 z-30">
+    <a href="login.html" class="ml-5 text-left fa fa-sign-out-alt text-2xl text-green-600"></a>
+    <div class="flex flex-col items-center">
+      <div class="flex items-center">
+        <i class="fas fa-leaf text-green-600 text-xl mr-1"></i>
+        <span class="font-extrabold text-xl mx-1">Hydropro</span>
+        <span class="font-semibold text-sm">v1.1</span>
+      </div>
+      <div class="text-xs font-semibold">By doy.codes</div>
+    </div>
+    <button class="mr-5 text-right fa fa-table-list text-green-600 text-2xl"></button>
+  </div>
+  <!--  -->
+
+  <!-- BAGIAN GRAFIK -->
+  <div class="grid mx-3 mt-28 mb-32">
+    <div class="w-full h-96 p-4 mb-5 rounded-3xl bg-white shadow-md">
+      <canvas id="chart-1"></canvas>
+    </div>
+    <div class="w-full h-96 p-4 mb-5 rounded-3xl bg-white shadow-md">
+      <canvas id="chart-2"></canvas>
+    </div>
+    <div class="w-full h-96 p-4 mb-5 rounded-3xl bg-white shadow-md">
+      <canvas id="chart-3"></canvas>
+    </div>
+    <div class="w-full h-96 p-4 rounded-3xl bg-white shadow-md">
+      <canvas id="chart-4"></canvas>
+    </div>
+  </div>
+  <!--  -->
+
+  <!-- BAGIAN NAVBAR -->
+  <div class="grid grid-cols-5 px-3 py-3 rounded-t-3xl fixed bottom-0 left-0 right-0 font-medium bg-white shadow-md">
+    <a class="grid p-2 text-center" href="grafik.html">
+      <div class="grid fas fa-chart-line text-2xl text-purple-500" id="tombol-grafik"></div>
+      <span class="text-xs mt-2">Charts</span>
+    </a>
+    <div class="grid p-2 text-center">
+      <button class="grid fas fa-download text-2xl text-green-500" id="tombol-download"></button>
+      <span class="text-xs mt-2">Data</span>
+    </div>
+    <a class="grid p-2 text-center" href="dashboard.html">
+      <button class="grid fas fa-home text-4xl text-yellow-500" id="tombol-home"></button>
+    </a>
+    <div class="grid p-2 text-center">
+      <button class="grid fas fa-refresh text-2xl text-red-500" id="tombol-reset"></button>
+      <span class="text-xs mt-2">Reset</span>
+    </div>
+    <a class="grid p-2 text-center" href="ubah.html">
+      <div class="grid fas fa-gear text-2xl text-blue-500" id="tombol-setting"></div>
+      <span class="text-xs mt-2">Setting</span>
+    </a>
+  </div>
+  <!--  -->
+
+  <script src="js/grafik.js"></script>
+  <script src="js/reset.js"></script>
+  <script src="js/download.js"></script>
+  <script src="js/pengaturan.js"></script>
+</body>
+
+</html>

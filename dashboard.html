@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Plantify</title>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+
+    <link rel="stylesheet" href="assets/tailwind.css" />
+    <link rel="stylesheet" href="assets/fontawesome/css/all.css" />
+    <link rel="stylesheet" href="style/style.css" />
+
+    <style>
+      @font-face {
+        font-family: "Digital";
+        src: url("assets/digital.woff2") format("woff2");
+        font-weight: 100 900;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: "Montserrat";
+        src: url("assets/montserrat.woff2") format("woff2");
+        font-weight: 100 900;
+        font-style: normal;
+      }
+    </style>
+  </head>
+
+  <body
+    class="max-w-screen-md mx-auto scroll-smooth text-gray-600 font-semibold antialiased text-center"
+  >
+    <!-- HEADER -->
+    <div class="grid mt-6">
+      <div class="grid grid-cols-3 items-center mx-7">
+        <div class="text-left">
+          <a class="fas fa-chart-line text-xl"></a>
+        </div>
+        <a href="" class="flex flex-col items-center">
+          <div class="flex items-center">
+            <i class="fas fa-seedling text-xl text-green-600"></i>
+            <span class="font-extrabold text-xl mx-2">Plantify</span>
+            <span class="text-xs">v1.1</span>
+          </div>
+          <div class="text-xs font-semibold">By doycodes</div>
+        </a>
+        <div class="text-right">
+          <a href="settings.html" class="fas fa-gear text-xl"></a>
+        </div>
+      </div>
+    </div>
+    <!--  -->
+
+    <!-- SEEDS -->
+    <div class="grid text-center justify-center mt-10">
+      <i class="fal fa-seedling text-9xl text-green-500 glow"></i>
+      <div id="greeting" class="font-extrabold mt-3 text-xl">-</div>
+    </div>
+    <!--  -->
+
+    <!-- DEVICE STATUS -->
+    <div
+      class="flex items-center justify-center text-xs font-bold rounded-2xl mt-3"
+    >
+      <span
+        id="dots"
+        class="fas fa-dot rounded-full w-2 h-2 bg-green-500"
+      ></span>
+      <span id="device-status" class="ml-1">-</span>
+    </div>
+    <!--  -->
+    <!-- TIMESTAMP -->
+    <div class="text-xs">
+      <span id="timestamp">-</span>
+      <span>WIB</span>
+    </div>
+    <!--  -->
+
+    <!-- SENSOR CARDS -->
+    <div class="grid mx-7 mt-7 rounded-3xl neumorphism">
+      <div class="grid grid-cols-4 gap-4 mx-4 mt-5">
+        <i class="fas fa-temperature-half text-green-600 text-xl"></i>
+        <i class="fas fa-vials text-green-600 text-xl"></i>
+        <i class="fas fa-flask text-green-600 text-xl"></i>
+        <i class="fas fa-sun-bright text-green-600 text-xl"></i>
+      </div>
+      <div class="grid grid-cols-4 gap-4 mt-3 mx-4">
+        <div class="neutank grid py-4 rounded-2xl">
+          <span id="sensor1" class="font-extrabold text-xl">-</span>
+          <span class="text-xs">°C</span>
+        </div>
+        <div class="neutank grid py-4 rounded-2xl">
+          <span id="sensor2" class="font-extrabold text-xl">-</span>
+          <span class="text-xs">pH</span>
+        </div>
+        <div class="neutank grid py-4 rounded-2xl">
+          <span id="sensor3" class="font-extrabold text-xl">-</span>
+          <span class="text-xs">ppm</span>
+        </div>
+        <div class="neutank grid py-4 rounded-2xl">
+          <span id="sensor4" class="font-extrabold text-xl">-</span>
+          <span class="text-xs">Lux</span>
+        </div>
+      </div>
+      <div
+        class="grid mt-3 mb-3 mx-3 rounded-3xl font-bold text-green-600 text-sm py-1"
+      >
+        Realtime Sensors
+      </div>
+    </div>
+    <!--  -->
+
+    <!-- SET -->
+    <div class="grid grid-cols-2 gap-7 mx-7 mt-7 font-bold">
+      <div class="grid neumorphism rounded-3xl py-4">
+        <div class="mx-5 text-left text-xs">
+          <span class="fas fa-gear text-green-600 mr-1"></span>pH
+        </div>
+        <div class="neutank rounded-2xl mt-3 mx-4 py-1 text-xl">
+          <div class="digital flex items-center justify-center">
+            <span id="ph-min">-</span>
+            <span class="mx-1">-</span>
+            <span id="ph-max">-</span>
+          </div>
+        </div>
+        <div class="mx-5 text-left mt-4 text-xs">
+          <span class="fas fa-gear text-green-600 mr-1"></span>PPM
+        </div>
+        <div class="neutank rounded-2xl mt-3 mx-4 py-1 text-xl">
+          <div class="digital flex items-center justify-center">
+            <span id="ppm-min">-</span>
+            <span class="mx-1">-</span>
+            <span id="ppm-max">-</span>
+          </div>
+        </div>
+      </div>
+      <div class="grid neumorphism rounded-3xl py-4">
+        <div class="mx-5 text-left text-xs">
+          <span class="fas fa-gear text-green-600 mr-1"></span>Growlight
+        </div>
+        <div class="neutank rounded-2xl mt-3 mx-4 py-1 text-xl">
+          <div class="digital flex items-center justify-center">
+            <span id="growlight-set">-</span>
+          </div>
+        </div>
+        <div class="mx-5 text-left mt-4 text-xs">
+          <span class="fas fa-gear text-green-600 mr-1"></span>Fan
+        </div>
+        <div class="neutank rounded-2xl mt-3 mx-4 py-1 text-xl">
+          <div class="digital flex items-center justify-center">
+            <span id="fan-set">-</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="grid mt-7 mx-7 font-bold text-green-600 text-sm py-1 neumorphism rounded-3xl"
+    >
+      User Settings
+    </div>
+    <!--  -->
+
+    <!-- TANK -->
+    <div class="grid mx-7 mt-7 rounded-3xl neumorphism">
+      <div class="grid grid-cols-4 text-center mb-3 text-green-600 mx-3 mt-4">
+        <i class="fas fa-up font-bold text-2xl mt-1"></i>
+        <i class="fas fa-down font-bold text-2xl mt-1"></i>
+        <i class="fas fa-a font-bold text-2xl mt-1"></i>
+        <i class="fas fa-b font-bold text-2xl mt-1"></i>
+      </div>
+
+      <div class="grid grid-cols-4 gap-5 text-center mt-1 mx-5">
+        <div class="">
+          <div class="relative rounded-2xl w-full h-44 overflow-hidden neutank">
+            <div
+              class="absolute inset-0 flex justify-center items-center text-white text-lg font-extrabold z-10"
+              id="tank-1"
+            >
+              -
+            </div>
+            <div
+              class="absolute left-0 bottom-0 w-full bg-green-500"
+              id="tanklevel1"
+            ></div>
+          </div>
+        </div>
+        <div class="">
+          <div class="relative rounded-2xl w-full h-44 overflow-hidden neutank">
+            <div
+              class="absolute inset-0 flex justify-center items-center text-white text-lg font-extrabold z-10"
+              id="tank-2"
+            >
+              -
+            </div>
+            <div
+              class="absolute left-0 bottom-0 w-full bg-green-500"
+              id="tanklevel2"
+            ></div>
+          </div>
+        </div>
+        <div class="">
+          <div class="relative rounded-2xl w-full h-44 overflow-hidden neutank">
+            <div
+              class="absolute inset-0 flex justify-center items-center text-white text-lg font-extrabold z-10"
+              id="tank-3"
+            >
+              -
+            </div>
+            <div
+              class="absolute left-0 bottom-0 w-full bg-green-500"
+              id="tanklevel3"
+            ></div>
+          </div>
+        </div>
+        <div class="">
+          <div class="relative rounded-2xl w-full h-44 overflow-hidden neutank">
+            <div
+              class="absolute inset-0 flex justify-center items-center text-white text-lg font-extrabold z-10"
+              id="tank-4"
+            >
+              -
+            </div>
+            <div
+              class="absolute left-0 bottom-0 w-full bg-green-500"
+              id="tanklevel4"
+            ></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid mt-3 mb-3 mx-3 font-bold text-green-600 text-sm py-1">
+        Liquid Tank Level
+      </div>
+    </div>
+    <!--  -->
+
+    <!-- STATUS -->
+    <div class="neumorphism grid mx-7 mt-7 rounded-3xl">
+      <div class="grid grid-cols-2 gap-4 mx-4 mt-4">
+        <div class="grid">
+          <div class="flex items-center ml-1">
+            <i class="fas fa-temperature-half text-green-600"></i>
+            <span class="ml-1 text-left text-xs font-bold">Temp</span>
+          </div>
+          <span
+            id="stat-1"
+            class="neutank digital py-1 text-xl rounded-2xl mt-3"
+            >-</span
+          >
+        </div>
+        <div class="grid">
+          <div class="flex items-center ml-1">
+            <i class="fas fa-sun-bright text-green-600"></i>
+            <span class="ml-1 text-left text-xs font-bold">Lights</span>
+          </div>
+          <span
+            id="stat-2"
+            class="neutank digital py-1 text-xl rounded-2xl mt-3"
+            >-</span
+          >
+        </div>
+        <div class="grid">
+          <div class="flex items-center ml-1">
+            <i class="fas fa-flask text-green-600"></i>
+            <span class="ml-1 text-left text-xs font-bold">pH</span>
+          </div>
+          <span
+            id="stat-3"
+            class="neutank digital py-1 text-xl rounded-2xl mt-3"
+            >-</span
+          >
+        </div>
+        <div class="grid">
+          <div class="flex items-center ml-1">
+            <i class="fas fa-vials text-green-600"></i>
+            <span class="ml-1 text-left text-xs font-bold">Nutrition</span>
+          </div>
+          <span
+            id="stat-4"
+            class="neutank digital py-1 text-xl rounded-2xl mt-3"
+            >-</span
+          >
+        </div>
+      </div>
+      <div class="mb-3 mt-3 font-bold text-green-600 text-sm py-1">
+        Condition Status
+      </div>
+    </div>
+    <!--  -->
+
+    <!-- PUMP -->
+    <div class="grid mx-7 mt-7">
+      <div class="grid grid-cols-2 gap-7">
+        <div class="grid neumorphism rounded-3xl p-3">
+          <div class="grid grid-cols-2 mt-3 mb-5">
+            <div id="stat-pompa-1" class="fas fa-up text-3xl"></div>
+            <div id="stat-pompa-2" class="fas fa-down text-3xl"></div>
+          </div>
+          <div class="grid text-xs font-bold">pH Pump</div>
+        </div>
+        <div class="grid neumorphism rounded-3xl p-3">
+          <div class="grid grid-cols-2 mt-3 mb-5">
+            <div id="stat-pompa-3" class="fas fa-a text-3xl"></div>
+            <div id="stat-pompa-4" class="fas fa-b text-3xl"></div>
+          </div>
+          <div class="grid text-xs font-bold">Nutrition Pump</div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="grid mt-7 mx-7 mb-10 font-bold text-green-600 text-sm py-1 neumorphism rounded-3xl"
+    >
+      Liquid Pump Status
+    </div>
+    <!--  -->
+
+    <!-- LOAD JS -->
+    <script src="js/endpoint.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/device.js"></script>
+    <script src="js/dom.js"></script>
+    <script src="js/greeting.js"></script>
+    <script src="js/notif.js"></script>
+    <!--  -->
+  </body>
+</html>
