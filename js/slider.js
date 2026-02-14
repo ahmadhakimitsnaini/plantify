@@ -1,5 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // Daftar ID untuk elemen input slider (range)
   const sliders = ['slider1', 'slider2', 'slider3', 'slider4', 'slider5', 'slider6'];
+  
+  // Mapping antara ID slider dengan ID elemen teks yang menampilkan angkanya
   const displayElements = {
     slider1: 'slider-1',
     slider2: 'slider-2',
@@ -9,42 +12,65 @@ document.addEventListener("DOMContentLoaded", function () {
     slider6: 'slider-6',
   };
 
-  // Fungsi untuk update tampilan slider value
+  /**
+   * Memperbarui tampilan angka di UI secara sinkron
+   * Mengambil nilai dari input range dan menaruhnya di elemen teks terkait
+   */
   const updateSliderDisplay = () => {
     sliders.forEach(id => {
       const slider = document.getElementById(id);
-      document.getElementById(displayElements[id]).textContent = slider.value;
+      const displayId = displayElements[id];
+      if (slider && document.getElementById(displayId)) {
+          document.getElementById(displayId).textContent = slider.value;
+      }
     });
   };
 
-  // Fungsi untuk debounce
+  // Objek untuk menyimpan state timer debounce setiap slider secara independen
   let debounceTimers = {};
+
+  /**
+   * Fungsi Debounce
+   * Mencegah pemanggilan fungsi berulang-ulang dalam waktu singkat.
+   * Sangat penting untuk mengurangi beban request ke server saat slider digeser.
+   */
   const debounce = (func, id, delay) => {
-    clearTimeout(debounceTimers[id]);
-    debounceTimers[id] = setTimeout(func, delay);
+    clearTimeout(debounceTimers[id]); // Hapus timer sebelumnya jika ada
+    debounceTimers[id] = setTimeout(func, delay); // Set timer baru
   };
 
-  // Fungsi untuk fetch nilai slider dari server
+  /**
+   * Mengambil data awal (GET) dari server
+   * Digunakan untuk sinkronisasi posisi slider saat halaman pertama kali dimuat
+   */
   const getSliders = async () => {
     try {
+      // Pastikan variabel endpoint_url sudah didefinisikan secara global sebelumnya
       const response = await fetch(endpoint_url + '/plantify/api/api_slider.php');
       const data = await response.json();
 
       sliders.forEach(id => {
+        // Cek apakah data untuk slider tersebut ada di response
         if (data[id] !== undefined) {
-          document.getElementById(id).value = data[id];
+          const element = document.getElementById(id);
+          if (element) element.value = data[id];
         }
       });
 
+      // Update angka di UI setelah nilai dari database masuk
       updateSliderDisplay();
     } catch (error) {
-      console.error("Error loading slider values:", error);
+      console.error("Gagal memuat nilai slider:", error);
     }
   };
 
-  // Fungsi untuk menyimpan nilai slider ke server
+  /**
+   * Mengirim perubahan nilai (POST) ke server
+   * @param {string} id - ID dari slider
+   * @param {string|number} value - Nilai slider
+   */
   const saveSliderValue = async (id, value) => {
-    const sliderData = { [id]: value };
+    const sliderData = { [id]: value }; // Membungkus data dalam objek dinamis
     try {
       const response = await fetch(endpoint_url + '/plantify/api/api_slider.php', {
         method: 'POST',
@@ -52,22 +78,28 @@ document.addEventListener("DOMContentLoaded", function () {
         body: JSON.stringify(sliderData),
       });
       const responseData = await response.json();
-      console.log(`Slider ${id} updated to ${value}. Server response:`, responseData);
+      console.log(`Slider ${id} berhasil diupdate ke ${value}. Respon Server:`, responseData);
     } catch (error) {
-      console.error(`Error sending value of slider ${id}:`, error);
+      console.error(`Gagal mengirim nilai slider ${id}:`, error);
     }
   };
 
-  // Pasang event listener pada setiap slider
+  // Inisialisasi Event Listener untuk setiap slider
   sliders.forEach(id => {
     const slider = document.getElementById(id);
 
-    slider.addEventListener('input', () => {
-      updateSliderDisplay();
-      debounce(() => saveSliderValue(id, slider.value), id, 500); // Delay 300ms sebelum POST
-    });
+    if (slider) {
+        slider.addEventListener('input', () => {
+          // 1. Update UI secara instan agar responsif di mata user
+          updateSliderDisplay();
+          
+          // 2. Simpan ke database dengan delay (debounce)
+          // Mencegah request dikirim setiap pixel pergeseran, menunggu user berhenti 500ms
+          debounce(() => saveSliderValue(id, slider.value), id, 500); 
+        });
+    }
   });
 
-  // Ambil nilai slider saat halaman dimuat
+  // Panggil fungsi getSliders saat inisialisasi script selesai
   getSliders();
 });
