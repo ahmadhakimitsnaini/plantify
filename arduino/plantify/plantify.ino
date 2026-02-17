@@ -34,8 +34,8 @@ String stat_ph, stat_ppm;
 String endpoint = "http://192.168.1.25/plantify/api";  
 
 // Kredensial WiFi
-const char* ssid = "MATLABUSSALIK";         
-const char* password = "merdekasejati";  
+const char* ssid = "P";         
+const char* password = "123456789";  
 
 // ==========================================
 // 3. FUNGSI SETUP (Dijalankan Sekali)
