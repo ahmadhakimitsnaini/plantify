@@ -1,19 +1,38 @@
-// Mengambil referensi elemen DOM yang akan dipantau perubahannya
+/**
+ * ============================================================
+ * SENSOR MONITORING SCRIPT
+ * ============================================================
+ * Skrip ini memantau elemen #sensor1 dan memicu notifikasi 
+ * jika nilainya mencapai angka kritis (>= 50).
+ */
+
+// 1. KONFIGURASI TARGET
+// Elemen DOM yang akan dipantau perubahannya (pastikan ID sesuai HTML)
 const targetNode = document.getElementById('sensor1'); 
 
-// Fungsi untuk membuat dan menampilkan notifikasi browser
+/**
+ * 2. FUNGSI NOTIFIKASI
+ * Menangani permintaan izin dan menampilkan notifikasi sistem.
+ * @param {number} newValue - Nilai sensor terbaru yang akan ditampilkan.
+ */
 function triggerNotification(newValue) {
-  // Cek apakah izin notifikasi sudah diberikan sebelumnya
+  // Cek apakah browser mendukung notifikasi
+  if (!("Notification" in window)) {
+    console.warn("Browser ini tidak mendukung notifikasi desktop");
+    return;
+  }
+
+  // Skenario 1: Izin sudah diberikan sebelumnya
   if (Notification.permission === "granted") {
     new Notification("Alert Sensor!", {
-      body: "Nilai sensor: " + newValue,
-      icon: '/path/to/icon.png' // Opsional: Tambahkan ikon agar lebih menarik
+      body: "Bahaya! Nilai sensor mencapai: " + newValue,
+      icon: '/assets/warning-icon.png', // Ganti dengan path ikon proyek Anda
+      tag: 'sensor-alert' // Mencegah penumpukan notifikasi (replace yang lama)
     });
   } 
-  // Jika belum ditolak (default), minta izin kepada user
+  // Skenario 2: Izin belum ditentukan (default), maka minta izin
   else if (Notification.permission !== "denied") {
     Notification.requestPermission().then((permission) => {
-      // Jika user memberikan izin, langsung tampilkan notifikasi
       if (permission === "granted") {
         new Notification("Alert Sensor!", {
           body: "Nilai sensor: " + newValue,
@@ -23,33 +42,37 @@ function triggerNotification(newValue) {
   }
 }
 
-// Inisialisasi MutationObserver untuk memantau perubahan pada DOM
+// 3. LOGIKA PEMANTAUAN (OBSERVER)
+// MutationObserver dieksekusi setiap kali ada perubahan pada targetNode
 const observer = new MutationObserver((mutationsList) => {
-  // Loop mutation record (meskipun biasanya hanya 1 perubahan teks)
   for(const mutation of mutationsList) {
+      // Memastikan perubahan terjadi pada childList (isi teks) atau characterData
       if (mutation.type === 'childList' || mutation.type === 'characterData') {
-          // Ambil teks konten terbaru, bersihkan spasi, dan ubah ke integer
+          
+          // Mengambil teks, menghapus spasi (trim), dan konversi ke Integer
           const currentText = targetNode.textContent.trim();
           const newValue = parseInt(currentText, 10); 
 
-          // Validasi: Pastikan nilainya adalah angka (bukan NaN) sebelum dicek
+          // LOGIKA BISNIS:
+          // 1. !isNaN(newValue) -> Pastikan data bukan sampah/kosong
+          // 2. newValue >= 50   -> Ambang batas pemicu alert
           if (!isNaN(newValue) && newValue >= 50) {
-            triggerNotification(newValue); // Panggil fungsi notifikasi
+            console.log(`Threshold terlampaui: ${newValue}`);
+            triggerNotification(newValue);
           }
       }
   }
 });
 
-// Mulai memantau elemen target
-// childList: true -> memantau penambahan/penghapusan node anak (teks adalah node anak)
-// subtree: true -> memantau perubahan di seluruh turunan elemen (opsional jika elemennya sederhana)
-// characterData: true -> (opsional) memantau perubahan nilai teks node secara langsung
+// 4. EKSEKUSI OBSERVER
+// Pastikan elemen ada sebelum menjalankan observer untuk menghindari error
 if (targetNode) {
     observer.observe(targetNode, { 
-        childList: true, 
-        subtree: true,
-        characterData: true 
+        childList: true,      // Pantau penambahan/penghapusan teks di dalamnya
+        subtree: true,        // Pantau juga elemen anak di dalam #sensor1 (jika ada)
+        characterData: true   // Pantau perubahan nilai teks secara langsung
     });
+    console.log("Monitoring sensor dimulai...");
 } else {
-    console.error("Elemen #sensor1 tidak ditemukan!");
+    console.error("Gagal inisialisasi: Elemen #sensor1 tidak ditemukan di DOM.");
 }
