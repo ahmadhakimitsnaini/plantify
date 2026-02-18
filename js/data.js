@@ -1,112 +1,83 @@
-/**
- * Konstanta URL API Endpoint
- * Pastikan variabel 'endpoint_url' sudah didefinisikan sebelumnya di file konfigurasi
- * atau di bagian atas script utama.
- */
-// const endpoint_url = "http://localhost/plantify"; // Contoh jika belum ada
+// Pastikan variabel 'endpoint_url' sudah didefinisikan secara global
 
 /**
- * Fungsi: load_data1
- * -------------------
- * Bertugas mengambil data telemetri sensor (Real-time) dari server.
- * Data mencakup: Nilai sensor, level tangki, status pH/PPM, dan status pompa.
+ * Mengambil data sensor real-time (Suhu, pH, TDS, Level Air)
+ * Endpoint: /api/api_data.php
  */
 async function load_data1() {
   try {
-    // 1. Fetch data dari API Backend (PHP)
-    const response = await fetch(endpoint_url + "/plantify/api/api_data.php");
+    const response = await fetch(`${endpoint_url}/plantify/api/api_data.php`);
+    if (!response.ok) throw new Error("Gagal mengambil data sensor");
 
-    // Cek jika server error (misal: 404 atau 500)
-    if (!response.ok) {
-      throw new Error("Network error!");
-    }
-
-    // 2. Konversi respon menjadi JSON object
     const data = await response.json();
-    // console.log(data); // Uncomment untuk debugging
 
-    // 3. Update UI: Nilai Sensor & Tangki
-    // Operator '??' (Nullish Coalescing) digunakan sebagai fallback.
-    // Jika data.sensor1 null/undefined, maka tampilkan "-"
+    // 1. Update Nilai Sensor (Gunakan '-' jika data null)
     document.getElementById("sensor1").textContent = data.sensor1 ?? "-";
     document.getElementById("sensor2").textContent = data.sensor2 ?? "-";
     document.getElementById("sensor3").textContent = data.sensor3 ?? "-";
     document.getElementById("sensor4").textContent = data.sensor4 ?? "-";
 
-    // Update Level Tangki (ditambah simbol %)
+    // 2. Update Persentase Tangki
     document.getElementById("tank-1").textContent = (data.tank1 ?? "-") + "%";
     document.getElementById("tank-2").textContent = (data.tank2 ?? "-") + "%";
     document.getElementById("tank-3").textContent = (data.tank3 ?? "-") + "%";
     document.getElementById("tank-4").textContent = (data.tank4 ?? "-") + "%";
 
-    // Update Statistik Global & Timestamp
+    // 3. Update Statistik & Timestamp
     document.getElementById("stat-3").textContent = data.stat_ph ?? "-";
     document.getElementById("stat-4").textContent = data.stat_ppm ?? "-";
     document.getElementById("timestamp").textContent = data.timestamp ?? "-";
 
-    // 4. Update Visual Status Pompa (1 s.d 4)
-    // Loop ini efisien untuk menghindari penulisan kode berulang 4 kali
+    // 4. Update Warna Indikator Pompa (Hijau = ON, Abu-abu = OFF)
     for (let i = 1; i <= 4; i++) {
-      const pompaElement = document.getElementById(`stat-pompa-${i}`);
+      const el = document.getElementById(`stat-pompa-${i}`);
+      const isOn = data[`stat_pompa_${i}`] === 1;
 
-      // Jika status 1 (Nyala), ubah warna jadi Hijau
-      if (data[`stat_pompa_${i}`] === 1) {
-        pompaElement.classList.add("text-green-500");
-        pompaElement.classList.remove("text-gray-700");
+      if (isOn) {
+        el.classList.add("text-green-500");
+        el.classList.remove("text-gray-700");
       } else {
-        // Jika status 0 (Mati), ubah warna jadi Abu-abu
-        pompaElement.classList.add("text-gray-700");
-        pompaElement.classList.remove("text-green-500");
+        el.classList.add("text-gray-700");
+        el.classList.remove("text-green-500");
       }
     }
+
   } catch (error) {
-    // Tangkap error jika fetch gagal (misal koneksi putus)
-    console.error("Error loading sensor data:", error);
+    console.error("Error load_data1:", error);
   }
 }
 
 /**
- * Fungsi: load_data2
- * -------------------
- * Bertugas mengambil data konfigurasi slider (Threshold/Batas).
- * Data ini biasanya tidak berubah secepat data sensor, jadi dipisahkan.
+ * Mengambil konfigurasi threshold/slider (Batas pH, PPM, dll)
+ * Endpoint: /api/api_slider.php
  */
 async function load_data2() {
   try {
-    const response = await fetch(endpoint_url + "/plantify/api/api_slider.php");
-
-    if (!response.ok) {
-      throw new Error("Network error!");
-    }
+    const response = await fetch(`${endpoint_url}/plantify/api/api_slider.php`);
+    if (!response.ok) throw new Error("Gagal mengambil data slider");
 
     const data = await response.json();
-    // console.log(data);
 
-    // Update UI: Batas Nilai (Threshold) pH & PPM
+    // Update UI Threshold (Batas Bawah & Atas)
     document.getElementById("ph-min").textContent = data.slider1 ?? "-";
     document.getElementById("ph-max").textContent = data.slider2 ?? "-";
     document.getElementById("ppm-min").textContent = data.slider3 ?? "-";
     document.getElementById("ppm-max").textContent = data.slider4 ?? "-";
 
-    // Update UI: Persentase Set Point Cahaya & Kipas
-    document.getElementById("growlight-set").textContent =
-      (data.slider5 ?? "-") + " %";
-    document.getElementById("fan-set").textContent =
-      (data.slider6 ?? "-") + " %";
+    // Update Set Point Cahaya & Kipas
+    document.getElementById("growlight-set").textContent = (data.slider5 ?? "-") + " %";
+    document.getElementById("fan-set").textContent = (data.slider6 ?? "-") + " %";
+
   } catch (error) {
-    console.error("Error loading slider config:", error);
+    console.error("Error load_data2:", error);
   }
 }
 
-// ============================================================
-// EKSEKUSI UTAMA
-// ============================================================
+// --- EKSEKUSI UTAMA ---
 
-// 1. Panggil fungsi sekali saat halaman pertama dimuat
-load_data1(); // Load sensor
-load_data2(); // Load slider
+// Load data pertama kali saat halaman dibuka
+load_data1(); 
+load_data2();
 
-// 2. Atur Polling (Update Otomatis)
-// Menjalankan load_data1 setiap 500ms (0.5 detik) agar data sensor terlihat realtime.
-// Catatan: load_data2 tidak di-looping karena data slider jarang berubah dari sisi server.
+// Refresh data sensor setiap 500ms (Real-time)
 setInterval(load_data1, 500);
