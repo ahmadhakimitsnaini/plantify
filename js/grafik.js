@@ -1,176 +1,122 @@
 // ==========================================
-// 1. KONFIGURASI GLOBAL & KONSTANTA
+// 1. KONFIGURASI & KONSTANTA
 // ==========================================
 const API_URL = 'http://192.168.100.203/hydropro/backend/load_data.php';
-const FETCH_INTERVAL = 500; // Interval pengambilan data (500ms = 0.5 detik) - Sangat cepat
+const FETCH_INTERVAL = 500; // 0.5 Detik
 
-// Standar gaya font untuk label dan axis agar konsisten
-const DEFAULT_FONT_OPTIONS = {
-  color: 'gray',
-  size: 13,
-  family: 'Montserrat',
-  weight: '600'
-};
-
-// Konfigurasi spesifik untuk masing-masing sensor (pH, TDS, Suhu, Kelembapan)
+// Konfigurasi visual sensor (Warna & Batas Y-Axis)
 const chartConfigs = [
-  { label: 'pH', yMin: 0, yMax: 14, color: '#32a4ea' },          // Biru
-  { label: 'TDS', yMin: 0, yMax: 1000, color: '#6cbe77' },       // Hijau
-  { label: 'Temperature', yMin: 0, yMax: 100, color: '#fb9700' },// Oranye
-  { label: 'Humidity', yMin: 0, yMax: 100, color: '#fc5c91' }    // Pink
+  { key: 'ph',         label: 'pH',           min: 0, max: 14,   color: '#32a4ea' },
+  { key: 'ppm',        label: 'TDS',          min: 0, max: 1000, color: '#6cbe77' },
+  { key: 'suhu',       label: 'Temperature',  min: 0, max: 100,  color: '#fb9700' },
+  { key: 'kelembapan', label: 'Humidity',     min: 0, max: 100,  color: '#fc5c91' }
 ];
 
+const fontStyle = { color: 'gray', size: 13, family: 'Montserrat', weight: '600' };
+
 // ==========================================
-// 2. INISIALISASI CHART
+// 2. INISIALISASI CHART.JS
 // ==========================================
-// Membuat array objek Chart.js berdasarkan konfigurasi di atas
 const charts = chartConfigs.map((config, index) => {
-  // Mengambil elemen canvas: chart-1, chart-2, dst.
   const ctx = document.getElementById(`chart-${index + 1}`).getContext('2d');
-  // Membuat instance Chart baru
-  return new Chart(ctx, createChartConfig(config));
+  return new Chart(ctx, generateChartOptions(ctx, config));
 });
 
-// Variabel untuk menyimpan data terakhir guna mencegah render ulang yang tidak perlu
-let lastData = null;
+let lastPayload = null; // Cache untuk mencegah render berulang
 
 // ==========================================
-// 3. FUNGSI UPDATE DATA (REAL-TIME)
+// 3. LOGIKA UPDATE DATA
 // ==========================================
-const updateCharts = async (payload) => {
-  // Cek apakah data baru sama persis dengan data lama (Debouncing sederhana)
-  if (JSON.stringify(payload) === JSON.stringify(lastData)) return;
-  lastData = payload; // Update cache data
 
-  // Mengambil referensi array data & label dari setiap chart yang sudah dibuat
-  const dataArrays = charts.map(chart => chart.data.datasets[0].data);
-  const labelsArrays = charts.map(chart => chart.data.labels); // Mengakses array labels dari chart.data
-
-  // Memasukkan data baru ke masing-masing chart
-  // Payload diharapkan berupa objek { ph: ..., ppm: ..., suhu: ..., kelembapan: ... }
-  updateChartDataAndLabels(dataArrays[0], labelsArrays[0], payload.ph);
-  updateChartDataAndLabels(dataArrays[1], labelsArrays[1], payload.ppm);
-  updateChartDataAndLabels(dataArrays[2], labelsArrays[2], payload.suhu);
-  updateChartDataAndLabels(dataArrays[3], labelsArrays[3], payload.kelembapan);
-
-  // Perintahkan Chart.js untuk merender ulang tampilan dengan animasi
-  charts.forEach(chart => chart.update());
-};
-
-// ==========================================
-// 4. FUNGSI FETCH API
-// ==========================================
+// Fungsi Fetch Data Utama
 const fetchData = async () => {
   try {
     const response = await fetch(API_URL);
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
+    if (!response.ok) throw new Error('Network error');
+    
     const data = await response.json();
-    // Panggil fungsi update setelah data diterima
-    await updateCharts(data);
+    updateDashboard(data);
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error('Fetch Error:', error);
   }
 };
 
-// Jalankan fetch secara berulang sesuai interval
-// Hati-hati: 500ms bisa membebani server jika user banyak
-const intervalId = setInterval(fetchData, FETCH_INTERVAL);
+// Fungsi Update Tampilan Grafik
+const updateDashboard = (data) => {
+  // 1. Cek apakah data berubah (Debouncing)
+  if (JSON.stringify(data) === JSON.stringify(lastPayload)) return;
+  lastPayload = data;
+
+  // 2. Loop setiap chart untuk update datanya
+  charts.forEach((chart, index) => {
+    const key = chartConfigs[index].key; // 'ph', 'ppm', dst
+    const value = data[key];
+    
+    updateChartData(chart, value);
+  });
+};
+
+// Helper: Manajemen Sliding Window Data (Max 30 Poin)
+function updateChartData(chart, value) {
+  const dataset = chart.data.datasets[0].data;
+  const labels = chart.data.labels;
+
+  if (dataset.length >= 30) {
+    dataset.shift(); // Hapus data terlama
+    labels.shift();
+  }
+
+  dataset.push(value); // Tambah data baru
+  labels.push(new Date().toLocaleTimeString('id-ID'));
+  
+  chart.update(); // Render ulang
+}
 
 // ==========================================
-// 5. HELPER: PEMBUAT KONFIGURASI CHART
+// 4. HELPER: VISUALISASI CHART
 // ==========================================
-function createChartConfig({ label, yMin, yMax, color }) {
-  // Kita perlu mengambil context lagi di sini untuk membuat Gradient
-  // (Mencari elemen berdasarkan label index di array config utama)
-  const chartIndex = chartConfigs.findIndex(config => config.label === label);
-  const ctx = document.getElementById(`chart-${chartIndex + 1}`).getContext('2d');
-
-  // Membuat efek gradasi warna (dari warna solid ke transparan di bawah)
+function generateChartOptions(ctx, { label, min, max, color }) {
+  // Buat gradien warna (Pudar ke bawah)
   const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(0, `${color}`);    // Warna atas (pekat)
-  gradient.addColorStop(1, `${color}00`);  // Warna bawah (transparan/0 opacity)
+  gradient.addColorStop(0, color);
+  gradient.addColorStop(1, `${color}00`);
 
   return {
-    type: 'line', // Jenis grafik: Garis
+    type: 'line',
     data: {
-      labels: [], // Label sumbu X (Waktu) akan diisi dinamis
+      labels: [],
       datasets: [{
         label,
-        data: [], // Data sumbu Y akan diisi dinamis
+        data: [],
         borderColor: color,
-        backgroundColor: gradient, // Gunakan gradien yang dibuat
-        fill: true, // Isi area di bawah garis
-        tension: 0.4, // Kelengkungan garis (0 = lurus, 0.4 = mulus)
-        pointRadius: 0, // Sembunyikan titik agar garis terlihat bersih
+        backgroundColor: gradient,
+        fill: true,
+        tension: 0.4,     // Garis melengkung halus
+        pointRadius: 0,   // Sembunyikan titik
         borderWidth: 2
       }]
     },
     options: {
-      plugins: {
-        legend: {
-          display: true,
-          labels: {
-            color: DEFAULT_FONT_OPTIONS.color,
-            font: {
-              size: DEFAULT_FONT_OPTIONS.size,
-              family: DEFAULT_FONT_OPTIONS.family,
-              weight: DEFAULT_FONT_OPTIONS.weight
-            }
-          }
-        },
-        tooltip: {
-            mode: 'index',
-            intersect: false,
-        }
-      },
       responsive: true,
-      maintainAspectRatio: false, // Agar grafik mengikuti ukuran kontainer induk
+      maintainAspectRatio: false,
+      animation: { duration: 0 }, // Matikan animasi berat agar performa lancar
+      plugins: {
+        legend: { labels: { color: fontStyle.color, font: fontStyle } }
+      },
       scales: {
         y: {
-          min: yMin,
-          max: yMax, // Batas atas dan bawah grafik
-          ticks: {
-            color: DEFAULT_FONT_OPTIONS.color,
-            font: {
-              size: DEFAULT_FONT_OPTIONS.size,
-              family: DEFAULT_FONT_OPTIONS.family,
-              weight: DEFAULT_FONT_OPTIONS.weight
-            }
-          },
-          grid: { display: false } // Hilangkan garis grid horizontal
+          min, max,
+          ticks: { color: fontStyle.color, font: fontStyle },
+          grid: { display: false }
         },
         x: {
-          ticks: {
-            color: DEFAULT_FONT_OPTIONS.color,
-            font: {
-              size: DEFAULT_FONT_OPTIONS.size,
-              family: DEFAULT_FONT_OPTIONS.family,
-              weight: DEFAULT_FONT_OPTIONS.weight
-            }
-          },
-          grid: { display: false } // Hilangkan garis grid vertikal
+          ticks: { color: fontStyle.color, font: fontStyle },
+          grid: { display: false }
         }
-      },
-      animation: {
-        duration: 0 // Matikan animasi berat saat update agar performa lancar
       }
     }
   };
 }
 
-// ==========================================
-// 6. HELPER: SLIDING WINDOW DATA
-// ==========================================
-function updateChartDataAndLabels(dataArray, labelsArray, newValue) {
-  // Batasi jumlah data yang ditampilkan hanya 30 titik terakhir
-  // Konsep: FIFO (First In First Out)
-  if (dataArray.length >= 30) {
-    dataArray.shift();   // Hapus data terlama (depan)
-    labelsArray.shift(); // Hapus label terlama (depan)
-  }
-
-  dataArray.push(newValue); // Tambah data baru (belakang)
-  labelsArray.push(new Date().toLocaleTimeString('id-ID')); // Tambah waktu sekarang
-}
+// Mulai Loop Data
+setInterval(fetchData, FETCH_INTERVAL);
